@@ -1,5 +1,6 @@
 ---
 title : ixa-pipe-nerc
+layout: default
 ---
 
 ixa-pipe-nerc
