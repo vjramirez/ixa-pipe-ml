@@ -1,6 +1,5 @@
-
 ---
-layout:pages
+title : ixa-pipe-nerc
 ---
 
 ixa-pipe-nerc
