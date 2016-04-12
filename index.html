@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>IXA pipes by ixa-ehu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">IXA pipes</h1>
+      <h2 class="project-tagline">Ready to Use NLP tools</h2>
+      <a href="https://github.com/ixa-ehu/ixa-pipe-ml" class="btn">View on GitHub</a>
+      <a href="https://github.com/ixa-ehu/ixa-pipe-ml/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/ixa-ehu/ixa-pipe-ml/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="ixa-pipe-ml" class="anchor" href="#ixa-pipe-ml" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ixa-pipe-ml</h1>
+
+<p>ixa-pipe-ml is the Machine Learning Component of IXA pipes. ixa-pipe-ml allows to
+train and evaluate the models for every IXA-pipe available.
+<strong>Current version is 0.0.1</strong></p>
+
+<p>ixa-pipe-ml is part of IXA pipes, a multilingual set of NLP tools developed
+by the IXA NLP Group [<a href="http://ixa2.si.ehu.es/ixa-pipes">http://ixa2.si.ehu.es/ixa-pipes</a>].</p>
+
+<p>Please go to [<a href="http://ixa2.si.ehu.es/ixa-pipes">http://ixa2.si.ehu.es/ixa-pipes</a>] for general information about the IXA
+pipes tools but also for <strong>official releases, including source code and binary
+packages for all the tools in the IXA pipes toolkit</strong>.</p>
+
+<p>This document is intended to be the <strong>usage guide of ixa-pipe-ml</strong>. If you really need to clone
+and install this repository instead of using the releases provided in
+[<a href="http://ixa2.si.ehu.es/ixa-pipes">http://ixa2.si.ehu.es/ixa-pipes</a>], please scroll down to the end of the document for
+the <a href="#installation">installation instructions</a>.</p>
+
+<p><strong>NOTICE!!</strong>: ixa-pipe-ml is now in <a href="http://search.maven.org/">Maven Central</a>
+for easy access to its API.</p>
+
+<h2>
+<a id="table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>TABLE OF CONTENTS</h2>
+
+<ol>
+<li>
+<a href="#overview">Overview of ixa-pipe-ml</a>
+
+<ul>
+<li><a href="#features">Available features</a></li>
+<li><a href="#nerc-models">NERC distributed models</a></li>
+<li><a href="#ote-models">OTE distributed models</a></li>
+</ul>
+</li>
+<li>
+<a href="#cli-usage">Usage of ixa-pipe-ml</a>
+
+<ul>
+<li><a href="#tagging">NERC tagging</a></li>
+<li><a href="#ote">Opinion Target Extraction (OTE)</a></li>
+<li><a href="#server">Server mode</a></li>
+<li><a href="#training">Training your own models</a></li>
+<li><a href="#evaluation">Evaluation</a></li>
+</ul>
+</li>
+<li><a href="#api">API via Maven Dependency</a></li>
+<li><a href="#installation">Git installation</a></li>
+</ol>
+
+<h2>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>OVERVIEW</h2>
+
+<p>ixa-pipe-ml provides:</p>
+
+<ul>
+<li>
+<strong>NERC</strong> for Basque, English, Spanish, Dutch, German and Italian. The named entity types are based on:
+
+<ul>
+<li>
+<strong>CONLL</strong>: LOCATION, MISC, ORGANIZATION and PERSON. See <a href="http://www.clips.ua.ac.be/conll2002/ner/">CoNLL 2002</a> and <a href="http://www.clips.ua.ac.be/conll2003/ner/">CoNLL 2003</a> for more information.</li>
+<li>
+<strong>SONAR-1</strong>: for Dutch, six main types, including CoNLL types plus PRODUCT and EVENT.</li>
+<li>
+<strong>Ancora</strong>: for Spanish, six main types, including CoNLL types plus DATE and NUMBER.</li>
+</ul>
+</li>
+<li>
+<strong>Opinion Target Extraction</strong> (OTE) for English. The models are trained on the SemEval 2014 and 2015 datasets;
+<strong>ixa-pipe-ml was the best system</strong> in <a href="http://alt.qcri.org/semeval2015/task12/">SemEval 2015 OTE subtask within task 12</a>.</li>
+<li>
+<strong>SuperSense Tagging</strong> (SST) for English. The models are trained on Semcor.</li>
+</ul>
+
+<p>Every model is self-contained, that is, the prop files are not needed to use them.
+You will find for each model a properties file describing its training although it is
+not needed to run the model. Please see the traininParams.properties template file
+for all available training options and documentation.</p>
+
+<p>We provide competitive models based on robust local features and exploiting unlabeled data
+via clustering features. The clustering features are based on Brown, Clark (2003)
+and Word2Vec clustering plus some gazetteers in some cases.
+To avoid duplication of efforts, we use and contribute to the API provided by the
+<a href="http://opennlp.apache.org">Apache OpenNLP project</a> with our own custom developed features for each of the three tasks.</p>
+
+<h3>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h3>
+
+<p><strong>A description of every feature is provided in the trainParams.properties properties
+file</strong> distributed with ixa-pipe-ml. As the training functionality is configured in
+properties files, please do check this document. For each model distributed,
+there is a prop file which describes the training of the model, as well as a
+log file which provides details about the evaluation and training process.</p>
+
+<h3>
+<a id="nerc-models" class="anchor" href="#nerc-models" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>NERC-Models</h3>
+
+<p>Every result in reported here can be reproduced using the evaluation functionality of ixa-pipe-ml or
+with the <a href="http://www.cnts.ua.ac.be/conll2002/ner/bin/conlleval.txt">conlleval script</a> using these scripts:</p>
+
+<p><strong>Reproducing results with conlleval</strong>: <a href="http://ixa2.si.ehu.es/ixa-pipes/models/results-conlleval.tar.gz">conlleval-results</a></p>
+
+<p><strong>NERC models</strong>:</p>
+
+<ul>
+<li>
+<strong>Release 1.5.4</strong> [685MB]: <a href="http://ixa2.si.ehu.es/ixa-pipes/models/nerc-models-1.5.4.tgz">nerc-models-latest.tgz</a>
+</li>
+</ul>
+
+<p>Every model is trained with the averaged Perceptron algorithm as described in (Collins 2002) and as implemented
+in Apache OpenNLP.</p>
+
+<ul>
+<li><p><strong>Basque</strong>: eu-clusters model, trained on egunkaria dataset, F1 76.72 on 3 class evaluation and F1 75.40 on 4 classes.</p></li>
+<li>
+<p><strong>English Models</strong>:</p>
+
+<ul>
+<li>
+<p><strong>CoNLL 2003 models</strong>: We distribute models trained with local features
+and with external knowledge. Each of the models improve in F1 (reported on testb data)
+but they get somewhat slower:</p>
+
+<ul>
+<li>CoNLL 2003 local + brown features: F1 88.50</li>
+<li>CoNLL 2003 local + clark features: F1 88.97</li>
+<li>CoNLL 2003 light clusters model: F1 90.27</li>
+<li>CoNLL 2003 clusters model: F1 90.82</li>
+<li>CoNLL 2003 clusters + dicts: F1 91.19</li>
+</ul>
+</li>
+<li><p><strong>Combined models</strong>: trained using Ontonotes 4.0, conll03 and muc 7 data, good for out of domain usage.</p></li>
+</ul>
+</li>
+<li>
+<p><strong>Spanish Models</strong>:</p>
+
+<ul>
+<li>CoNLL 2002 clusters: F1 84.16</li>
+<li>CoNLL 2002 clusters + dict: F1 84.30</li>
+</ul>
+</li>
+<li>
+<p><strong>Dutch Models</strong>:</p>
+
+<ul>
+<li>CoNLL 2002 clusters: F1 84.23</li>
+<li>CoNLL 2002 clusters + dict: F1 84.91</li>
+</ul>
+</li>
+<li>
+<p><strong>German Models</strong>:</p>
+
+<ul>
+<li>CoNLL 2003 clusters + dict: F1 76.42</li>
+</ul>
+</li>
+<li>
+<p><strong>Italian Models</strong>:</p>
+
+<ul>
+<li>Evalita09 clusters: F1 80.38</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="ote-models" class="anchor" href="#ote-models" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>OTE-Models</h3>
+
+<ul>
+<li><p><strong>Latest models</strong>: <a href="http://ixa2.si.ehu.es/ixa-pipes/models/ote-models-1.5.0.tgz">ote-models-latest</a></p></li>
+<li>
+<p><strong>English Models</strong>:</p>
+
+<ul>
+<li>Trained on SemEval 2014 restaurants dataset.</li>
+<li>Trained on SemEval 2015 restaurants dataset (ote subtask winner).</li>
+</ul>
+</li>
+</ul>
+
+<h2>
+<a id="cli-usage" class="anchor" href="#cli-usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>CLI-USAGE</h2>
+
+<p>ixa-pipe-ml provides the following command-line basic functionalities:</p>
+
+<ol>
+<li>
+<strong>server</strong>: starts a TCP service loading the model and required resources.</li>
+<li>
+<strong>client</strong>: sends a NAF document to a running TCP server.</li>
+<li>
+<strong>tag</strong>: reads a NAF document containing <em>wf</em> and <em>term</em> elements and tags named
+entities.</li>
+<li>
+<strong>ote</strong>: reads a NAF document containing <em>wf</em> and <em>term</em> elements and performs
+opinion target extraction (OTE).</li>
+<li>
+<strong>train</strong>: trains new models for NERC, OTE and SST with several options
+available.</li>
+<li>
+<strong>eval</strong>: evaluates a trained model with a given test set.</li>
+<li>
+<strong>cross</strong>: it performs cross validation on a corpus.</li>
+</ol>
+
+<p>Each of these functionalities are accessible by adding (server|client|tag|ote|train|eval|cross) as a
+subcommand to ixa-pipe-ml-$version.jar. Please read below and check the -help
+parameter:</p>
+
+<div class="highlight highlight-source-shell"><pre>java -jar target/ixa-pipe-ml-<span class="pl-smi">$version</span>.jar (tag<span class="pl-k">|</span>ote<span class="pl-k">|</span>train<span class="pl-k">|</span><span class="pl-c1">eval</span><span class="pl-k">|</span>cross) -help</pre></div>
+
+<p><strong>Every option for training is documented in the trainParams.properties file distributed with
+ixa-pipe-ml</strong>. Please do read that file!!</p>
+
+<h3>
+<a id="tagging" class="anchor" href="#tagging" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tagging</h3>
+
+<p>If you are in hurry, just execute:</p>
+
+<div class="highlight highlight-source-shell"><pre>cat file.txt <span class="pl-k">|</span> ixa-pipe-tok <span class="pl-k">|</span> ixa-pipe-pos <span class="pl-k">|</span> java -jar <span class="pl-smi">$PATH</span>/target/ixa-pipe-ml-<span class="pl-smi">$version</span>.jar tag -m model.bin</pre></div>
+
+<p>If you want to know more, please follow reading.</p>
+
+<p>ixa-pipe-ml reads NAF documents (with <em>wf</em> and <em>term</em> elements) via standard input and outputs NAF
+through standard output. The NAF format specification is here:</p>
+
+<p>(<a href="http://wordpress.let.vupr.nl/naf/">http://wordpress.let.vupr.nl/naf/</a>)</p>
+
+<p>You can get the necessary input for ixa-pipe-ml by piping
+<a href="https://github.com/ixa-ehu/ixa-pipe-tok">ixa-pipe-tok</a> and
+<a href="https://github.com/ixa-ehu/ixa-pipe-pos">ixa-pipe-pos</a> as shown in the
+example.</p>
+
+<p>There are several options to tag with ixa-pipe-ml:</p>
+
+<ul>
+<li>
+<strong>model</strong>: pass the model as a parameter.</li>
+<li>
+<strong>language</strong>: pass the language as a parameter.</li>
+<li>
+<strong>outputFormat</strong>: Output annotation in a format: available CoNLL03, CoNLL02,
+OpenNLP native format and NAF. It defaults to NAF.</li>
+<li>
+<strong>lexer</strong>: switches on the rule-based DFA for NERC tagging. Currently we only provide
+one option <strong>numeric</strong>, which identifies "numeric entities" such as DATE,
+TIME, MONEY and PERCENT for all the languages currently in ixa-pipe-ml.</li>
+<li>
+<strong>dictTag</strong>: directly tag named entities contained in a gazetteer.
+
+<ul>
+<li>
+<strong>tag</strong>: with tag option, only dictionary entities are annotated.</li>
+<li>
+<strong>post</strong>: with post option, the output of the statistical model is
+post-processed.</li>
+</ul>
+</li>
+<li>
+<strong>dictPath</strong>: the directory containing the gazetteers for the --dictTag
+option.</li>
+</ul>
+
+<p><strong>Example</strong>:</p>
+
+<div class="highlight highlight-source-shell"><pre>cat file.txt <span class="pl-k">|</span> ixa-pipe-tok <span class="pl-k">|</span> ixa-pipe-pos <span class="pl-k">|</span> java -jar <span class="pl-smi">$PATH</span>/target/ixa-pipe-ml-<span class="pl-smi">$version</span>.jar tag -m nerc-models-<span class="pl-smi">$version</span>/en/en-local-conll03.bin</pre></div>
+
+<h3>
+<a id="ote" class="anchor" href="#ote" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>OTE</h3>
+
+<p>As for NER tagging, the ote requires an input NAF with <em>wf</em> and <em>term</em> elements:</p>
+
+<div class="highlight highlight-source-shell"><pre>cat file.txt <span class="pl-k">|</span> ixa-pipe-tok <span class="pl-k">|</span> ixa-pipe-pos <span class="pl-k">|</span> java -jar <span class="pl-smi">$PATH</span>/target/ixa-pipe-ml-<span class="pl-smi">$version</span>.jar ote -m model.bin</pre></div>
+
+<p>ixa-pipe-ml reads NAF documents (with <em>wf</em> and <em>term</em> elements) via standard input and outputs opinion targets in NAF
+through standard output. The NAF format specification is here:</p>
+
+<p>(<a href="http://wordpress.let.vupr.nl/naf/">http://wordpress.let.vupr.nl/naf/</a>)</p>
+
+<p>You can get the necessary input for ixa-pipe-ml by piping
+<a href="https://github.com/ixa-ehu/ixa-pipe-tok">ixa-pipe-tok</a> and
+<a href="https://github.com/ixa-ehu/ixa-pipe-pos">ixa-pipe-pos</a> as shown in the
+example.</p>
+
+<p>There are several options to tag with ixa-pipe-ml:</p>
+
+<ul>
+<li>
+<strong>model</strong>: pass the model as a parameter.</li>
+<li>
+<strong>language</strong>: pass the language as a parameter.</li>
+<li>
+<strong>outputFormat</strong>: Output annotation in a format: available OpenNLP native format and NAF. It defaults to NAF.</li>
+</ul>
+
+<p><strong>Example</strong>:</p>
+
+<div class="highlight highlight-source-shell"><pre>cat file.txt <span class="pl-k">|</span> ixa-pipe-tok <span class="pl-k">|</span> ixa-pipe-pos <span class="pl-k">|</span> java -jar <span class="pl-smi">$PATH</span>/target/ixa-pipe-ml-<span class="pl-smi">$version</span>.jar ote -m ote-models-<span class="pl-smi">$version</span>/en/ote-semeval2014-restaurants.bin</pre></div>
+
+<h3>
+<a id="server" class="anchor" href="#server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Server</h3>
+
+<p>We can start the TCP server as follows:</p>
+
+<div class="highlight highlight-source-shell"><pre>java -jar target/ixa-pipe-ml-<span class="pl-smi">$version</span>.jar server -l en --port 2060 -m en-91-18-conll03.bin</pre></div>
+
+<p>Once the server is running we can send NAF documents containing (at least) the term layer like this:</p>
+
+<div class="highlight highlight-source-shell"><pre> cat file.pos.naf <span class="pl-k">|</span> java -jar target/ixa-pipe-ml-<span class="pl-smi">$version</span>.jar client -p 2060</pre></div>
+
+<h3>
+<a id="training" class="anchor" href="#training" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Training</h3>
+
+<p>To train a new model for NERC, OTE or SST, you just need to pass a training parameters file as an
+argument. As it has been already said, the options are documented in the
+template trainParams.properties file.</p>
+
+<p><strong>Example</strong>:</p>
+
+<div class="highlight highlight-source-shell"><pre>java -jar target/ixa.pipe.nerc-<span class="pl-smi">$version</span>.jar train -p trainParams.properties</pre></div>
+
+<p><strong>Training with Features using External Resources</strong>: For training with dictionary or clustering
+based features (Brown, Clark and Word2Vec) you need to pass the lexicon as
+value of the respective feature in the prop file. This is only for training, as
+for tagging or evaluation the model is serialized with all resources included.</p>
+
+<h3>
+<a id="evaluation" class="anchor" href="#evaluation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Evaluation</h3>
+
+<p>You can evaluate a trained model or a prediction data against a reference data
+or testset.</p>
+
+<ul>
+<li>
+<strong>language</strong>: provide the language.</li>
+<li>
+<strong>model</strong>: if evaluating a model, pass the model.</li>
+<li>
+<strong>testset</strong>: the testset or reference set.</li>
+<li>
+<strong>corpusFormat</strong>: the format of the reference set and of the prediction set
+if --prediction option is chosen.</li>
+<li>
+<strong>prediction</strong>: evaluate against a  prediction corpus instead of against a
+model.</li>
+<li>
+<strong>evalReport</strong>: detail of the evaluation report
+
+<ul>
+<li>
+<strong>brief</strong>: just the F1, precision and recall scores</li>
+<li>
+<strong>detailed</strong>, the F1, precision and recall per class</li>
+<li>
+<strong>error</strong>: the list of false positives and negatives</li>
+</ul>
+</li>
+</ul>
+
+<p><strong>Example</strong>:</p>
+
+<div class="highlight highlight-source-shell"><pre>java -jar target/ixa.pipe.nerc-<span class="pl-smi">$version</span>.jar <span class="pl-c1">eval</span> -m nerc-models-<span class="pl-smi">$version</span>/en/en-local-conll03.bin -l en -t conll03.testb</pre></div>
+
+<h2>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>API</h2>
+
+<p>The easiest way to use ixa-pipe-ml programatically is via Apache Maven. Add
+this dependency to your pom.xml:</p>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-k">&lt;</span>dependency<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>groupId<span class="pl-k">&gt;</span>eus.ixa<span class="pl-k">&lt;</span>/groupId<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>artifactId<span class="pl-k">&gt;</span>ixa-pipe-ml<span class="pl-k">&lt;</span>/artifactId<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>version<span class="pl-k">&gt;</span>1.5.<span class="pl-k">4&lt;</span>/version<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/dependency<span class="pl-k">&gt;</span></pre></div>
+
+<h2>
+<a id="javadoc" class="anchor" href="#javadoc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>JAVADOC</h2>
+
+<p>The javadoc of the module is located here:</p>
+
+<div class="highlight highlight-source-shell"><pre>ixa-pipe-ml/target/ixa-pipe-ml-<span class="pl-smi">$version</span>-javadoc.jar</pre></div>
+
+<h2>
+<a id="module-contents" class="anchor" href="#module-contents" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Module contents</h2>
+
+<p>The contents of the module are the following:</p>
+
+<pre><code>+ formatter.xml           Apache OpenNLP code formatter for Eclipse SDK
++ pom.xml                 maven pom file which deals with everything related to compilation and execution of the module
++ src/                    java source code of the module and required resources
++ Furthermore, the installation process, as described in the README.md, will generate another directory:
+target/                 it contains binary executable and other directories
++ trainParams.properties      A template properties file containing documention
+for every available option
+</code></pre>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>INSTALLATION</h2>
+
+<p>Installing the ixa-pipe-ml requires the following steps:</p>
+
+<p>If you already have installed in your machine the Java 1.7+ and MAVEN 3, please go to step 3
+directly. Otherwise, follow these steps:</p>
+
+<h3>
+<a id="1-install-jdk-17-or-jdk-18" class="anchor" href="#1-install-jdk-17-or-jdk-18" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Install JDK 1.7 or JDK 1.8</h3>
+
+<p>If you do not install JDK 1.7+ in a default location, you will probably need to configure the PATH in .bashrc or .bash_profile:</p>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-k">export</span> JAVA_HOME=/yourpath/local/java7
+<span class="pl-k">export</span> PATH=<span class="pl-smi">${JAVA_HOME}</span>/bin:<span class="pl-smi">${PATH}</span></pre></div>
+
+<p>If you use tcsh you will need to specify it in your .login as follows:</p>
+
+<div class="highlight highlight-source-shell"><pre>setenv JAVA_HOME /usr/java/java17
+setenv PATH <span class="pl-smi">${JAVA_HOME}</span>/bin:<span class="pl-smi">${PATH}</span></pre></div>
+
+<p>If you re-login into your shell and run the command</p>
+
+<div class="highlight highlight-source-shell"><pre>java -version</pre></div>
+
+<p>You should now see that your JDK is 1.7 or 1.8.</p>
+
+<h3>
+<a id="2-install-maven-3" class="anchor" href="#2-install-maven-3" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>2. Install MAVEN 3</h3>
+
+<p>Download MAVEN 3 from</p>
+
+<div class="highlight highlight-source-shell"><pre>wget http://apache.rediris.es/maven/maven-3/3.0.5/binaries/apache-maven-3.0.5-bin.tar.gz</pre></div>
+
+<p>Now you need to configure the PATH. For Bash Shell:</p>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-k">export</span> MAVEN_HOME=/home/ragerri/local/apache-maven-3.0.5
+<span class="pl-k">export</span> PATH=<span class="pl-smi">${MAVEN_HOME}</span>/bin:<span class="pl-smi">${PATH}</span></pre></div>
+
+<p>For tcsh shell:</p>
+
+<div class="highlight highlight-source-shell"><pre>setenv MAVEN3_HOME <span class="pl-k">~</span>/local/apache-maven-3.0.5
+setenv PATH <span class="pl-smi">${MAVEN3}</span>/bin:{PATH}</pre></div>
+
+<p>If you re-login into your shell and run the command</p>
+
+<div class="highlight highlight-source-shell"><pre>mvn -version</pre></div>
+
+<p>You should see reference to the MAVEN version you have just installed plus the JDK that is using.</p>
+
+<h3>
+<a id="3-get-module-source-code" class="anchor" href="#3-get-module-source-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3. Get module source code</h3>
+
+<p>If you must get the module source code from here do this:</p>
+
+<div class="highlight highlight-source-shell"><pre>git clone https://github.com/ixa-ehu/ixa-pipe-ml</pre></div>
+
+<h3>
+<a id="4-compile" class="anchor" href="#4-compile" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>4. Compile</h3>
+
+<p>Execute this command to compile ixa-pipe-ml:</p>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-c1">cd</span> ixa-pipe-ml
+mvn clean package</pre></div>
+
+<p>This step will create a directory called target/ which contains various directories and files.
+Most importantly, there you will find the module executable:</p>
+
+<p>ixa-pipe-ml-$version.jar</p>
+
+<p>This executable contains every dependency the module needs, so it is completely portable as long
+as you have a JVM 1.7 installed.</p>
+
+<p>To install the module in the local maven repository, usually located in ~/.m2/, execute:</p>
+
+<div class="highlight highlight-source-shell"><pre>mvn clean install</pre></div>
+
+<h2>
+<a id="contact-information" class="anchor" href="#contact-information" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contact information</h2>
+
+<div class="highlight highlight-source-shell"><pre>Rodrigo Agerri
+IXA NLP Group
+University of the Basque Country (UPV/EHU)
+E-20018 Donostia-San Sebastián
+rodrigo.agerri@ehu.eus</pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/ixa-ehu/ixa-pipe-ml">IXA pipes</a> is maintained by <a href="https://github.com/ixa-ehu">ixa-ehu</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
