@@ -64,25 +64,25 @@ public class DictionaryPolarityTagger {
 	    return this.dictMap;
 	}
 
-	  /**
-	   * Lookup word in a dictionary. Outputs "O" if not found.
-	   * 
-	   * @param word
-	   *          the word
-	   * @return the polarity
-	   */
-	  public String apply(final String word) {
-	    String polarity = null;
-	    final String key = word;
-	    // lookup lemma as value of the map
-	    final String keyValue = this.dictMap.get(key);
-	    if (keyValue != null) {
-	    	polarity = keyValue;
-	    } else {
-	    	polarity = "O";
-	    }
-	    return polarity;
-	  }
+  /**
+   * Lookup word in a dictionary. Outputs "O" if not found.
+   * 
+   * @param word
+   *          the word
+   * @return the polarity
+   */
+	public String apply(final String word) {
+		String polarity = null;
+		final String key = word;
+		// lookup lemma as value of the map
+		final String keyValue = this.dictMap.get(key);
+		if (keyValue != null) {
+			polarity = keyValue;
+		} else {
+			polarity = "O";
+		}
+		return polarity;
+	}
 	
 	
 }
