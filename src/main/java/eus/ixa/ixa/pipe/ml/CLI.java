@@ -29,6 +29,7 @@ import eus.ixa.ixa.pipe.ml.eval.ParserEvaluate;
 import eus.ixa.ixa.pipe.ml.eval.SequenceLabelerEvaluate;
 import eus.ixa.ixa.pipe.ml.eval.TokenizerEvaluate;
 import eus.ixa.ixa.pipe.ml.parse.ParserModel;
+import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationModel;
 import eus.ixa.ixa.pipe.ml.sequence.SequenceLabelerModel;
 import eus.ixa.ixa.pipe.ml.utils.Flags;
 import eus.ixa.ixa.pipe.ml.utils.IOUtils;
@@ -39,7 +40,6 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 import opennlp.tools.cmdline.CmdLineUtil;
-import opennlp.tools.doccat.DoccatModel;
 import opennlp.tools.util.TrainingParameters;
 
 /**
@@ -134,8 +134,8 @@ public class CLI {
         .help("Cross validation CLI");
     loadCrossValidateParameters();
     this.docTrainerParser = this.subParsers.addParser(DOC_TRAINER_NAME)
-            .help("Document Classification training CLI");
-        loadDocTrainingParameters();
+        .help("Document Classification training CLI");
+    loadDocTrainingParameters();
   }
 
   /**
@@ -282,7 +282,7 @@ public class CLI {
     }
     final DocumentClassificationTrainer docTrainer = new DocumentClassificationTrainer(
         params);
-    final DoccatModel trainedModel = docTrainer.train(params);
+    final DocumentClassificationModel trainedModel = docTrainer.train(params);
     CmdLineUtil.writeModel("ixa-pipe-ml", new File(outModel), trainedModel);
   }
   

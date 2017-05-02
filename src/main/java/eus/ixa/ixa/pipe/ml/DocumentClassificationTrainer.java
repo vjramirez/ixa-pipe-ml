@@ -17,12 +17,17 @@
 package eus.ixa.ixa.pipe.ml;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Map;
 
+import eus.ixa.ixa.pipe.ml.features.XMLFeatureDescriptor;
+import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationEvaluator;
+import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationFactory;
+import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationME;
+import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationModel;
+import eus.ixa.ixa.pipe.ml.resources.LoadModelResources;
 import eus.ixa.ixa.pipe.ml.utils.Flags;
 import eus.ixa.ixa.pipe.ml.utils.IOUtils;
-import opennlp.tools.doccat.DoccatFactory;
-import opennlp.tools.doccat.DoccatModel;
-import opennlp.tools.doccat.DocumentCategorizerME;
 import opennlp.tools.doccat.DocumentSample;
 import opennlp.tools.doccat.DocumentSampleStream;
 import opennlp.tools.util.ObjectStream;
@@ -49,13 +54,29 @@ public class DocumentClassificationTrainer {
 	   */
 	  private final String trainData;
 	  /**
+	   * String holding the testData.
+	   */
+	  private final String testData;
+	  /**
+	   * Reset the adaptive features every newline in the training data.
+	   */
+	  private final String clearTrainingFeatures;
+	  /**
+	   * Reset the adaptive features every newline in the testing data.
+	   */
+	  private final String clearEvaluationFeatures;
+	  /**
 	   * ObjectStream of the training data.
 	   */
 	  private ObjectStream<DocumentSample> trainSamples;
 	  /**
+	   * ObjectStream of the test data.
+	   */
+	  private ObjectStream<DocumentSample> testSamples;
+	  /**
 	   * features needs to be implemented by any class extending this one.
 	   */
-	  private DoccatFactory newFactory;
+	  private DocumentClassificationFactory newFactory;
 	  
 	  /**
 	   * Construct a trainer with training and test data, and with options for
@@ -71,8 +92,12 @@ public class DocumentClassificationTrainer {
 		      throws IOException {
 
 		    this.lang = Flags.getLanguage(params);
+		    this.clearTrainingFeatures = Flags.getClearTrainingFeatures(params);
+		    this.clearEvaluationFeatures = Flags.getClearEvaluationFeatures(params);
 		    this.trainData = params.getSettings().get("TrainSet");
+		    this.testData = params.getSettings().get("TestSet");
 		    this.trainSamples = getDocumentStream(this.trainData);
+		    this.testSamples = getDocumentStream(this.testData);
 		    createDocumentClassificationFactory(params);
 		  }
 	  
@@ -86,17 +111,28 @@ public class DocumentClassificationTrainer {
 	   */
 	  public void createDocumentClassificationFactory(final TrainingParameters params)
 	      throws IOException {
-	    newFactory = new DoccatFactory();
+		  final String featureDescription = XMLFeatureDescriptor
+			        .createXMLFeatureDescriptor(params);
+		  System.err.println(featureDescription);
+		  final byte[] featureGeneratorBytes = featureDescription
+			        .getBytes(Charset.forName("UTF-8"));
+		  final Map<String, Object> resources = LoadModelResources
+			        .loadSequenceResources(params);
+		  setDocumentClassificationFactory(
+				  DocumentClassificationFactory.create(DocumentClassificationFactory.class.getName(),
+			            featureGeneratorBytes, resources));
 	  }
 	  
-	  public final DoccatModel train(final TrainingParameters params) {
+	  public final DocumentClassificationModel train(final TrainingParameters params) {
 		    if (getDocumentClassificationFactory() == null) {
 		      throw new IllegalStateException(
 		          "The DocumentClassificationFactory must be instantiated!!");
 		    }
-		    DoccatModel trainedModel = null;
+		    DocumentClassificationModel trainedModel = null;
 		    try {
-		    	trainedModel = DocumentCategorizerME.train(this.lang, trainSamples, params, newFactory);
+		    	trainedModel = DocumentClassificationME.train(this.lang, this.trainSamples, params, this.newFactory);
+		    	final DocumentClassificationME docClassification = new DocumentClassificationME(trainedModel);
+		    	trainingEvaluate(docClassification);
 		    } catch (final IOException e) {
 		      System.err.println("IO error while loading traing and test sets!");
 		      e.printStackTrace();
@@ -104,16 +140,26 @@ public class DocumentClassificationTrainer {
 		    }
 		    return trainedModel;
 	  }
+	  
+	  private void trainingEvaluate(final DocumentClassificationME DocumentClassification) {
+		      final DocumentClassificationEvaluator evaluator = new DocumentClassificationEvaluator(DocumentClassification);
+		      try {
+		        evaluator.evaluate(this.testSamples);
+		      } catch (final IOException e) {
+		        e.printStackTrace();
+		      }
+		      System.out.println();
+		      System.out.println("Document Count: " + evaluator.getDocumentCount());
+		      System.out.println("Accuracy: " + evaluator.getAccuracy());
+		    
+		  }
+	  
 	  /**
 	   * Getting the stream with the right corpus format.
 	   * 
 	   * @param inputData
 	   *          the input data
-	   * @param clearFeatures
-	   *          clear the features
-	   * @param aCorpusFormat
-	   *          the corpus format
-	   * @return the stream from the several corpus formats
+	   * @return the stream from the documents
 	   * @throws IOException
 	   *           the io exception
 	   */
@@ -131,7 +177,13 @@ public class DocumentClassificationTrainer {
 	   * 
 	   * @return the features
 	   */
-	  public final DoccatFactory getDocumentClassificationFactory() {
+	  public final DocumentClassificationFactory getDocumentClassificationFactory() {
+	    return this.newFactory;
+	  }
+	  
+	  public final DocumentClassificationFactory setDocumentClassificationFactory(
+	      final DocumentClassificationFactory tokenNameFinderFactory) {
+	    this.newFactory = tokenNameFinderFactory;
 	    return this.newFactory;
 	  }
 
