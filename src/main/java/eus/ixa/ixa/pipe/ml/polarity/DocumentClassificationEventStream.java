@@ -1,6 +1,9 @@
 package eus.ixa.ixa.pipe.ml.polarity;
 
+import java.util.ArrayList;
+//import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import opennlp.tools.doccat.DocumentSample;
 import opennlp.tools.ml.model.Event;
@@ -73,8 +76,27 @@ public class DocumentClassificationEventStream
 	  
 	  @Override
 	  protected Iterator<Event> createEvents(final DocumentSample sample) {
+		  
+		  final List<Event> events = new ArrayList<Event>(sample.getText().length);
+		  
+		  //List<String> featuresList = new ArrayList<String>();
+		  
+		  for (int i = 0; i < sample.getText().length; i++) {
+			  
+			  String[] features = contextGenerator.getContext(i, sample.getText(), null, null);
+			  
+			  //System.err.println("\t ..." + sample.getCategory() + "|" + Arrays.toString(features));
+			  
+			  //if(!featuresList.contains(sample.getCategory() + "|" + Arrays.toString(features))) {
+				  events.add(
+				          new Event(sample.getCategory(), features));
+				  //featuresList.add(sample.getCategory() + "|" + Arrays.toString(features));
+			  //}
+		  }
+		  
+		  return events.iterator();
 
-	    return new Iterator<Event>(){
+	    /*return new Iterator<Event>(){
 
 	      private boolean isVirgin = true;
 
@@ -92,6 +114,6 @@ public class DocumentClassificationEventStream
 
 	      public void remove() {
 	        throw new UnsupportedOperationException();
-	      }};
+	      }};*/
 	  }
 }

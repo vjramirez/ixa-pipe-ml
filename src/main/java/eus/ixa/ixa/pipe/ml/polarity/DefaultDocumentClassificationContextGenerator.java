@@ -20,11 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import opennlp.tools.util.featuregen.AdaptiveFeatureGenerator;
-import opennlp.tools.util.featuregen.BigramNameFeatureGenerator;
 import opennlp.tools.util.featuregen.CachedFeatureGenerator;
-import opennlp.tools.util.featuregen.OutcomePriorFeatureGenerator;
 import opennlp.tools.util.featuregen.PreviousMapFeatureGenerator;
-import opennlp.tools.util.featuregen.TokenClassFeatureGenerator;
 import opennlp.tools.util.featuregen.TokenFeatureGenerator;
 import opennlp.tools.util.featuregen.WindowFeatureGenerator;
 
@@ -37,11 +34,7 @@ public class DefaultDocumentClassificationContextGenerator
 	  @Deprecated
 	  private static AdaptiveFeatureGenerator windowFeatures = new CachedFeatureGenerator(
 	      new AdaptiveFeatureGenerator[] {
-	          new WindowFeatureGenerator(new TokenFeatureGenerator(), 2, 2),
-	          new WindowFeatureGenerator(new TokenClassFeatureGenerator(true), 2,
-	              2),
-	          new OutcomePriorFeatureGenerator(), new PreviousMapFeatureGenerator(),
-	          new BigramNameFeatureGenerator() });
+	          new WindowFeatureGenerator(new TokenFeatureGenerator(), 5, 5)});
 	  /**
 	   * Creates a name context generator with the specified cache size.
 	   *
@@ -101,9 +94,7 @@ public class DefaultDocumentClassificationContextGenerator
 	    final List<String> features = new ArrayList<String>();
 
 	    for (final AdaptiveFeatureGenerator featureGenerator : this.featureGenerators) {
-	    	for (int i = 0; i < tokens.length; i++) {
-	    		featureGenerator.createFeatures(features, tokens, i, preds);
-	    	}
+	    		featureGenerator.createFeatures(features, tokens, index, preds);
 	    }
 
 	    return features.toArray(new String[features.size()]);

@@ -158,15 +158,7 @@ public class DocumentClassificationME implements DocumentClassification {
 			final EventTrainer trainer = TrainerFactory
 					.getEventTrainer(mlParams.getSettings(), manifestInfoEntries);
 			nameFinderModel = trainer.train(eventStream);
-		} /*else if (TrainerType.EVENT_MODEL_SEQUENCE_TRAINER.equals(trainerType)) {
-			final DocumentClassificationSequenceStream ss = new DocumentClassificationSequenceStream(
-					samples, factory.createContextGenerator());
-
-			final EventModelSequenceTrainer trainer = TrainerFactory
-					.getEventModelSequenceTrainer(mlParams.getSettings(),
-							manifestInfoEntries);
-			nameFinderModel = trainer.train(ss);
-		}*/ else {
+		} else {
 		    throw new IllegalStateException("Unexpected trainer type!");
 	    }
 		

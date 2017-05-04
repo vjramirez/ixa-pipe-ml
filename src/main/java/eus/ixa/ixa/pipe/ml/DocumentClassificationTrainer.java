@@ -114,8 +114,12 @@ public class DocumentClassificationTrainer {
 		  final String featureDescription = XMLFeatureDescriptor
 			        .createXMLFeatureDescriptor(params);
 		  System.err.println(featureDescription);
-		  final byte[] featureGeneratorBytes = featureDescription
+		  byte[] featureGeneratorBytes = featureDescription
 			        .getBytes(Charset.forName("UTF-8"));
+		  //if there are not feature generators in properties
+		  if (featureDescription.contains("<generators />")) {
+			  featureGeneratorBytes = null;
+		  }
 		  final Map<String, Object> resources = LoadModelResources
 			        .loadSequenceResources(params);
 		  setDocumentClassificationFactory(
