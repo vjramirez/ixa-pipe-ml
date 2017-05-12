@@ -23,7 +23,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Map;
+import java.util.Properties;
 
+import opennlp.tools.ml.BeamSearch;
 import opennlp.tools.ml.model.MaxentModel;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.model.ArtifactSerializer;
@@ -78,13 +80,14 @@ public class DocumentClassificationModel extends BaseModel {
 	
 	 public DocumentClassificationModel(final String languageCode,
 		      final MaxentModel nameFinderModel,
+		      final int beamSize,
 		      final byte[] generatorDescriptor, final Map<String, Object> resources,
 		      final Map<String, String> manifestInfoEntries,
 		      final DocumentClassificationFactory factory) {
 		    super(COMPONENT_NAME, languageCode, manifestInfoEntries, factory);
 
-		    //final Properties manifest = (Properties) this.artifactMap.get(MANIFEST_ENTRY);
-		    //manifest.put(BeamSearch.BEAM_SIZE_PARAMETER, Integer.toString(beamSize));
+		    final Properties manifest = (Properties) this.artifactMap.get(MANIFEST_ENTRY);
+		    manifest.put(BeamSearch.BEAM_SIZE_PARAMETER, Integer.toString(beamSize));
 
 		    init(nameFinderModel, generatorDescriptor, resources, manifestInfoEntries);
 

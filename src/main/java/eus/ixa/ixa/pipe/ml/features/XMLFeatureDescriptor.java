@@ -140,6 +140,16 @@ public final class XMLFeatureDescriptor {
           .println("-> Word Shape SuperSense Features added!: Window range "
               + leftWindow + ":" + rightWindow);
     }
+    if (Flags.isBagOfWordsFeature(params)) {
+    	final String BagOfWordsFeaturesUseOnlyAllLetterTokens = Flags
+    	          .getBagOfWordsFeaturesUseOnlyAllLetterTokens(params);
+        final Element BagOfWordsFeature = new Element("custom");
+        BagOfWordsFeature.setAttribute("class",
+        		BagOfWordsFeatureGenerator.class.getName());
+        BagOfWordsFeature.setAttribute("useOnlyAllLetterTokens", BagOfWordsFeaturesUseOnlyAllLetterTokens);
+        generators.addContent(BagOfWordsFeature);
+        System.err.println("-> Bag of Words Features added!");
+    }
     if (Flags.isOutcomePriorFeature(params)) {
       final Element outcomePriorFeature = new Element("custom");
       outcomePriorFeature.setAttribute("class",

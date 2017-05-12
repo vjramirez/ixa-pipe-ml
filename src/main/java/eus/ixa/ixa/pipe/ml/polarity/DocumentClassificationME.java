@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-
-import opennlp.tools.doccat.DocumentSample;
+import eus.ixa.ixa.pipe.ml.sequence.SequenceLabelerME;
+import opennlp.tools.ml.BeamSearch;
 import opennlp.tools.ml.EventTrainer;
 import opennlp.tools.ml.TrainerFactory;
 import opennlp.tools.ml.TrainerFactory.TrainerType;
@@ -140,9 +140,28 @@ public class DocumentClassificationME implements DocumentClassification {
 		return model.getMaxentModel().getOutcome(index);
 	}
 	
-	public static DocumentClassificationModel train(String languageCode, ObjectStream<DocumentSample> samples,
+	  /**
+	   * Forgets all adaptive data which was collected during previous calls to one
+	   * of the find methods.
+	   *
+	   * This method is typical called at the end of a document.
+	   */
+	  @Override
+	  public void clearAdaptiveData() {
+	    this.mContextGenerator.clearAdaptiveData();
+	  }
+	
+	public static DocumentClassificationModel train(String languageCode, ObjectStream<DocumentClassificationSample> samples,
 			TrainingParameters mlParams, DocumentClassificationFactory factory)
 		          throws IOException {
+		
+		final String beamSizeString = mlParams.getSettings()
+		        .get(BeamSearch.BEAM_SIZE_PARAMETER);
+
+		    int beamSize = DocumentClassificationME.DEFAULT_BEAM_SIZE;
+		    if (beamSizeString != null) {
+		      beamSize = Integer.parseInt(beamSizeString);
+		    }
 
 		final Map<String, String> manifestInfoEntries = new HashMap<String, String>();
 		
@@ -162,7 +181,7 @@ public class DocumentClassificationME implements DocumentClassification {
 		    throw new IllegalStateException("Unexpected trainer type!");
 	    }
 		
-		return new DocumentClassificationModel(languageCode, nameFinderModel,
+		return new DocumentClassificationModel(languageCode, nameFinderModel, beamSize,
 		          factory.getFeatureGenerator(), factory.getResources(),
 		          manifestInfoEntries, factory);
 		

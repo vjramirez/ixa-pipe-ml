@@ -96,4 +96,12 @@ public interface DocumentClassification {
 	   * @return a map with the score as a key. The value is a Set of categories with the score.
 	   */
 	  SortedMap<Double, Set<String>> sortedScoreMap(String[] text);
+	  
+	  /**
+	   * Forgets all adaptive data which was collected during previous calls to one
+	   * of the find methods.
+	   *
+	   * This method is typical called at the end of a document.
+	   */
+	  public void clearAdaptiveData();
 }

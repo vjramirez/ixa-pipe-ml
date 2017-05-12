@@ -5,14 +5,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import opennlp.tools.doccat.DocumentSample;
 import opennlp.tools.ml.model.Event;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.featuregen.AdditionalContextFeatureGenerator;
 import opennlp.tools.util.featuregen.WindowFeatureGenerator;
 
 public class DocumentClassificationEventStream 
-	extends opennlp.tools.util.AbstractEventStream<DocumentSample> {
+	extends opennlp.tools.util.AbstractEventStream<DocumentClassificationSample> {
 
 	private final DocumentClassificationContextGenerator contextGenerator;
 	private final AdditionalContextFeatureGenerator additionalContextFeatureGenerator = new AdditionalContextFeatureGenerator();
@@ -30,7 +29,7 @@ public class DocumentClassificationEventStream
 	   *          the encoding
 	   */
 	  public DocumentClassificationEventStream(
-	      final ObjectStream<DocumentSample> dataStream,
+	      final ObjectStream<DocumentClassificationSample> dataStream,
 	      final DocumentClassificationContextGenerator contextGenerator) {
 	    super(dataStream);
 	    
@@ -40,7 +39,7 @@ public class DocumentClassificationEventStream
 	  }
 
 	  public DocumentClassificationEventStream(
-	      final ObjectStream<DocumentSample> dataStream) {
+	      final ObjectStream<DocumentClassificationSample> dataStream) {
 	    this(dataStream, new DefaultDocumentClassificationContextGenerator());
 	  }
 	  /*
@@ -56,7 +55,7 @@ public class DocumentClassificationEventStream
 		  }
 	  
 	  @Override
-	  protected Iterator<Event> createEvents(final DocumentSample sample) {
+	  protected Iterator<Event> createEvents(final DocumentClassificationSample sample) {
 
 	    if (sample.isClearAdaptiveDataSet()) {
 	      this.contextGenerator.clearAdaptiveData();
@@ -75,7 +74,7 @@ public class DocumentClassificationEventStream
 	  }*/
 	  
 	  @Override
-	  protected Iterator<Event> createEvents(final DocumentSample sample) {
+	  protected Iterator<Event> createEvents(final DocumentClassificationSample sample) {
 		  
 		  final List<Event> events = new ArrayList<Event>(sample.getText().length);
 		  

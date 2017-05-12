@@ -1,12 +1,11 @@
 package eus.ixa.ixa.pipe.ml.polarity;
 
 import opennlp.tools.doccat.DocumentCategorizer;
-import opennlp.tools.doccat.DocumentSample;
 import opennlp.tools.tokenize.TokenSample;
 import opennlp.tools.util.eval.Evaluator;
 import opennlp.tools.util.eval.Mean;
 
-public class DocumentClassificationEvaluator extends Evaluator<DocumentSample>{
+public class DocumentClassificationEvaluator extends Evaluator<DocumentClassificationSample>{
 	private DocumentClassification categorizer;
 
 	private Mean accuracy = new Mean();
@@ -23,15 +22,15 @@ public class DocumentClassificationEvaluator extends Evaluator<DocumentSample>{
 	}
 	
 	  /**
-	   * Evaluates the given reference {@link DocumentSample} object.
+	   * Evaluates the given reference {@link DocumentClassificationSample} object.
 	   *
 	   * This is done by categorizing the document from the provided
-	   * {@link DocumentSample}. The detected category is then used
+	   * {@link DocumentClassificationSample}. The detected category is then used
 	   * to calculate and update the score.
 	   *
 	   * @param sample the reference {@link TokenSample}.
 	   */
-	public DocumentSample processSample(DocumentSample sample) {
+	public DocumentClassificationSample processSample(DocumentClassificationSample sample) {
 
 	    String[] document = sample.getText();
 
@@ -46,7 +45,7 @@ public class DocumentClassificationEvaluator extends Evaluator<DocumentSample>{
 	      accuracy.add(0);
 	    }
 
-	    return new DocumentSample(cat, sample.getText());
+	    return new DocumentClassificationSample(cat, sample.getText(), sample.isClearAdaptiveDataSet());
 	}
 	
 	  /**

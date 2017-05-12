@@ -25,11 +25,11 @@ import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationEvaluator;
 import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationFactory;
 import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationME;
 import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationModel;
+import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationSample;
+import eus.ixa.ixa.pipe.ml.polarity.DocumentClassificationSampleStream;
 import eus.ixa.ixa.pipe.ml.resources.LoadModelResources;
 import eus.ixa.ixa.pipe.ml.utils.Flags;
 import eus.ixa.ixa.pipe.ml.utils.IOUtils;
-import opennlp.tools.doccat.DocumentSample;
-import opennlp.tools.doccat.DocumentSampleStream;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.TrainingParameters;
 
@@ -68,11 +68,11 @@ public class DocumentClassificationTrainer {
 	  /**
 	   * ObjectStream of the training data.
 	   */
-	  private ObjectStream<DocumentSample> trainSamples;
+	  private ObjectStream<DocumentClassificationSample> trainSamples;
 	  /**
 	   * ObjectStream of the test data.
 	   */
-	  private ObjectStream<DocumentSample> testSamples;
+	  private ObjectStream<DocumentClassificationSample> testSamples;
 	  /**
 	   * features needs to be implemented by any class extending this one.
 	   */
@@ -80,8 +80,7 @@ public class DocumentClassificationTrainer {
 	  
 	  /**
 	   * Construct a trainer with training and test data, and with options for
-	   * language, beamsize for decoding, sequence codec and corpus format (conll or
-	   * opennlp).
+	   * language, beamsize for decoding.
 	   * 
 	   * @param params
 	   *          the training parameters
@@ -96,8 +95,8 @@ public class DocumentClassificationTrainer {
 		    this.clearEvaluationFeatures = Flags.getClearEvaluationFeatures(params);
 		    this.trainData = params.getSettings().get("TrainSet");
 		    this.testData = params.getSettings().get("TestSet");
-		    this.trainSamples = getDocumentStream(this.trainData);
-		    this.testSamples = getDocumentStream(this.testData);
+		    this.trainSamples = getDocumentStream(this.trainData, this.clearTrainingFeatures);
+		    this.testSamples = getDocumentStream(this.testData, this.clearEvaluationFeatures);
 		    createDocumentClassificationFactory(params);
 		  }
 	  
@@ -167,11 +166,11 @@ public class DocumentClassificationTrainer {
 	   * @throws IOException
 	   *           the io exception
 	   */
-	  public static ObjectStream<DocumentSample> getDocumentStream(
-	      final String inputData) throws IOException {
+	  public static ObjectStream<DocumentClassificationSample> getDocumentStream(
+	      final String inputData, final String clearFeatures) throws IOException {
 	      final ObjectStream<String> nameStream = IOUtils
 	          .readFileIntoMarkableStreamFactory(inputData);
-	      ObjectStream<DocumentSample> sampleStream = new DocumentSampleStream(nameStream);
+	      ObjectStream<DocumentClassificationSample> sampleStream = new DocumentClassificationSampleStream(clearFeatures, nameStream);
 	    return sampleStream;
 	  }
 	  
