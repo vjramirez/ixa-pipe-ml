@@ -19,25 +19,28 @@ package eus.ixa.ixa.pipe.ml.polarity;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 
-import opennlp.tools.doccat.DoccatModel;
-import opennlp.tools.doccat.DocumentCategorizerME;
+import opennlp.tools.tokenize.WhitespaceTokenizer;
 
 public class DocumentClassificationTagger {
 	
 	private final static char tabDelimiter = '\t';
 	private final static char NewLineDelimiter = '\n';
-	private final DoccatModel model;
+	private final DocumentClassificationModel model;
 	
 	public DocumentClassificationTagger(final String inputModel) throws IOException {
 		
 		InputStream is = new FileInputStream(inputModel);
-		model = new DoccatModel(is);
+		model = new DocumentClassificationModel(is);
 	}
 	
 	public String classify(final String document) {
-		DocumentCategorizerME myCategorizer = new DocumentCategorizerME(model);
-		double[] outcomes = myCategorizer.categorize(document);
+		
+		DocumentClassificationME myCategorizer = new DocumentClassificationME(model);
+		// Whitespace tokenize entire string
+	    String tokens[] = WhitespaceTokenizer.INSTANCE.tokenize(document);
+		double[] outcomes = myCategorizer.categorize(tokens, Collections.emptyMap());
 		String category = myCategorizer.getBestCategory(outcomes);
 		return document + tabDelimiter + category + NewLineDelimiter;
 	}

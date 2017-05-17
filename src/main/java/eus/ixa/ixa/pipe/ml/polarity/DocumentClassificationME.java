@@ -1,15 +1,17 @@
 package eus.ixa.ixa.pipe.ml.polarity;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import eus.ixa.ixa.pipe.ml.sequence.SequenceLabelerME;
 import opennlp.tools.ml.BeamSearch;
 import opennlp.tools.ml.EventTrainer;
 import opennlp.tools.ml.TrainerFactory;
@@ -60,8 +62,20 @@ public class DocumentClassificationME implements DocumentClassification {
 	   */
 	@Override
 	public double[] categorize(String[] text, Map<String, Object> extraInformation) {
-	    return model.getMaxentModel().eval(
-	        mContextGenerator.getContext(0, text, null, null));
+		
+		//String[] features = null;
+		List<String> listString = new ArrayList<String>();
+		
+		
+		
+		for (int i = 0; i < text.length; i++) {
+			String[] featuresTemp = mContextGenerator.getContext(i, text, null, null);
+			listString.addAll(Arrays.asList(featuresTemp));
+			//features = ArrayUtils.addAll();
+		}
+		
+	    return model.getMaxentModel().eval(listString.toArray(new String[0]));
+	        
 	}
 	  
 	  /**

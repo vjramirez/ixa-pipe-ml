@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import opennlp.tools.ml.BeamSearch;
+import opennlp.tools.ml.model.AbstractModel;
 import opennlp.tools.ml.model.MaxentModel;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.model.ArtifactSerializer;
@@ -65,7 +66,7 @@ public class DocumentClassificationModel extends BaseModel {
 		}
 	}
 	
-	private static final String COMPONENT_NAME = "DocumentCategorizerME";
+	private static final String COMPONENT_NAME = "DocumentClassificationME";
 	//private static final String DOCCAT_MODEL_ENTRY_NAME = "doccat.model";
 	static final String GENERATOR_DESCRIPTOR_ENTRY_NAME = "generator.featuregen";
 	private static final String MAXENT_MODEL_ENTRY_NAME = "DocumentClassification.model";
@@ -170,6 +171,15 @@ public class DocumentClassificationModel extends BaseModel {
 	public DocumentClassificationFactory getFactory() {
 		return (DocumentClassificationFactory) this.toolFactory;
 	}
+	
+	  @Override
+	  protected void validateArtifactMap() throws InvalidFormatException {
+	    super.validateArtifactMap();
+
+	    if (!(artifactMap.get(MAXENT_MODEL_ENTRY_NAME) instanceof AbstractModel)) {
+	      throw new InvalidFormatException("Documentclassification model is incomplete!");
+	    }
+	  }
 	
 	  @Override
 	  protected void createArtifactSerializers(
