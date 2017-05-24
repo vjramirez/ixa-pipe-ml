@@ -18,7 +18,10 @@ import opennlp.tools.ml.TrainerFactory;
 import opennlp.tools.ml.TrainerFactory.TrainerType;
 import opennlp.tools.ml.model.Event;
 import opennlp.tools.ml.model.MaxentModel;
+import opennlp.tools.ml.model.SequenceClassificationModel;
 import opennlp.tools.util.ObjectStream;
+import opennlp.tools.util.Sequence;
+import opennlp.tools.util.SequenceValidator;
 import opennlp.tools.util.TrainingParameters;
 import opennlp.tools.util.featuregen.AdditionalContextFeatureGenerator;
 import opennlp.tools.util.featuregen.WindowFeatureGenerator;
@@ -27,9 +30,12 @@ import opennlp.tools.util.featuregen.WindowFeatureGenerator;
 public class DocumentClassificationME implements DocumentClassification {
 
 	public static final int DEFAULT_BEAM_SIZE = 3;
-	protected DocumentClassificationModel model;
+	private static String[][] EMPTY = new String[0][0];
+	protected SequenceClassificationModel<String> model;
 	protected DocumentClassificationContextGenerator mContextGenerator;
 	private final AdditionalContextFeatureGenerator additionalContextFeatureGenerator = new AdditionalContextFeatureGenerator();
+	private Sequence bestSequence;
+	private final SequenceValidator<String> sequenceValidator;
 	
 	
 	/**
@@ -39,11 +45,13 @@ public class DocumentClassificationME implements DocumentClassification {
 	   * @param model the DocumentClassification model
 	   */
 	public DocumentClassificationME(DocumentClassificationModel model) {
-		this.model = model;
+		this.model = model.getDocumentClassificationModel();
 	    /*this.mContextGenerator = new DocumentClassificationContextGenerator(this.model
 	        .getFactory().getFeatureGenerators());*/
 	    
 	    final DocumentClassificationFactory factory = model.getFactory();
+	    
+	    this.sequenceValidator = new DocumentClassificationSequenceValidator();
 	    
 	    //this.model = model.getDocumentClassificationModel();
 	    this.mContextGenerator = factory.createContextGenerator();
@@ -58,13 +66,57 @@ public class DocumentClassificationME implements DocumentClassification {
 	   * the provided extra information
 	   *
 	   * @param text text tokens to categorize
-	   * @param extraInformation additional information
+	   * @param additionalContext additional Context
 	   */
 	@Override
-	public double[] categorize(String[] text, Map<String, Object> extraInformation) {
+	public String categorize(String[] text, final String[][] additionalContext) {
+		
+		this.additionalContextFeatureGenerator.setCurrentContext(additionalContext);
+	    this.bestSequence = this.model.bestSequence(text, additionalContext,
+	        this.mContextGenerator, this.sequenceValidator);
+	    final List<String> c = this.bestSequence.getOutcomes();
+	    final double[] d = this.bestSequence.getProbs();
+	    
+	    this.mContextGenerator.updateAdaptiveData(text,
+		        c.toArray(new String[c.size()]));
+	    
+	    
+	    
+	    //System.err.println("Cantidad Outcomes: " + c.size());
+	    //System.err.println("Cantidad Probs: " + d.length);
+	    
+	    Map<String, Double> OutcomesMap = new HashMap<String, Double>();
+	    
+	    for (int i = 0; i<c.size(); i++) {
+	    	//System.err.println("Outcome"+i+": "+c.get(i)+" ... Prob"+i+": "+d[i]);
+	    	if (OutcomesMap.containsKey(c.get(i))) {
+	    		OutcomesMap.put(c.get(i), OutcomesMap.get(c.get(i)) + 1000 + d[i]);
+	    	}
+	    	else {
+	    		OutcomesMap.put(c.get(i), 1000 + d[i]);
+	    	}
+	    }
+	    
+	    //System.err.println("Score: " + this.bestSequence.getScore());
+	    
+	    
+	    Map.Entry<String, Double> tmpEntry = null;
+	    double maxValue = 0;
+	    for (Map.Entry<String, Double> entry : OutcomesMap.entrySet())
+	    {
+	    	if (entry.getValue() > maxValue) {
+	    		tmpEntry = entry;
+	    		maxValue = entry.getValue();
+	    	}
+	    }
+	    
+	    //System.err.println("Resultado Final: " + tmpEntry.getKey() + " ... " + tmpEntry.getValue());
+	    
+	    return tmpEntry.getKey();
 		
 		//String[] features = null;
-		List<String> listString = new ArrayList<String>();
+		/*
+	    List<String> listString = new ArrayList<String>();
 		
 		
 		
@@ -75,7 +127,7 @@ public class DocumentClassificationME implements DocumentClassification {
 		}
 		
 	    return model.getMaxentModel().eval(listString.toArray(new String[0]));
-	        
+	    */
 	}
 	  
 	  /**
@@ -84,8 +136,8 @@ public class DocumentClassificationME implements DocumentClassification {
 	   * @param text the text to categorize
 	   */
 	@Override
-	public double[] categorize(String[] text) {
-	    return this.categorize(text, Collections.emptyMap());
+	public String categorize(String[] text) {
+	    return this.categorize(text, EMPTY);
 	}
 	
 	/**
@@ -93,7 +145,7 @@ public class DocumentClassificationME implements DocumentClassification {
 	   *
 	   * @param text the input text to classify
 	   * @return the score map
-	   */
+	   
 	@Override
 	public Map<String, Double> scoreMap(String[] text) {
 		Map<String, Double> probDist = new HashMap<>();
@@ -105,7 +157,7 @@ public class DocumentClassificationME implements DocumentClassification {
 	      probDist.put(category, categorize[getIndex(category)]);
 	    }
 	    return probDist;
-	}
+	}*/
 	
 	/**
 	   * Returns a map with the score as a key in ascending order.
@@ -114,7 +166,7 @@ public class DocumentClassificationME implements DocumentClassification {
 	   *
 	   * @param text the input text to classify
 	   * @return the sorted score map
-	   */
+	   
 	@Override
 	public SortedMap<Double, Set<String>> sortedScoreMap(String[] text) {
 		SortedMap<Double, Set<String>> descendingMap = new TreeMap<>();
@@ -132,8 +184,8 @@ public class DocumentClassificationME implements DocumentClassification {
 	      }
 	    }
 	    return descendingMap;
-	}
-	
+	}*/
+	/*
 	public String getBestCategory(double[] outcome) {
 	    return model.getMaxentModel().getBestOutcome(outcome);
 	}
@@ -153,7 +205,7 @@ public class DocumentClassificationME implements DocumentClassification {
 	public String getCategory(int index) {
 		return model.getMaxentModel().getOutcome(index);
 	}
-	
+	*/
 	  /**
 	   * Forgets all adaptive data which was collected during previous calls to one
 	   * of the find methods.

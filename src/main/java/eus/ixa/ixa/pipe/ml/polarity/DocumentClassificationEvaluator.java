@@ -1,5 +1,7 @@
 package eus.ixa.ixa.pipe.ml.polarity;
 
+import java.util.List;
+
 import opennlp.tools.doccat.DocumentCategorizer;
 import opennlp.tools.tokenize.TokenSample;
 import opennlp.tools.util.eval.Evaluator;
@@ -34,9 +36,10 @@ public class DocumentClassificationEvaluator extends Evaluator<DocumentClassific
 
 	    String[] document = sample.getText();
 
-	    double[] probs = categorizer.categorize(document);
+	    String cat = categorizer.categorize(document);
 
-	    String cat = categorizer.getBestCategory(probs);
+	    //String cat = categorizer.getBestCategory(probs);
+	    //String cat = probs.get(0);
 
 	    if (sample.getCategory().equals(cat)) {
 	      accuracy.add(1);

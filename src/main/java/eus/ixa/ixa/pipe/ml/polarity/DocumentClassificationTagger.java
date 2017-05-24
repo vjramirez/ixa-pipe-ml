@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.List;
 
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 
@@ -40,8 +41,9 @@ public class DocumentClassificationTagger {
 		DocumentClassificationME myCategorizer = new DocumentClassificationME(model);
 		// Whitespace tokenize entire string
 	    String tokens[] = WhitespaceTokenizer.INSTANCE.tokenize(document);
-		double[] outcomes = myCategorizer.categorize(tokens, Collections.emptyMap());
-		String category = myCategorizer.getBestCategory(outcomes);
+	    String category = myCategorizer.categorize(tokens);
+		//String category = myCategorizer.getBestCategory(outcomes);
+	    //String category = outcomes.get(0);
 		return document + tabDelimiter + category + NewLineDelimiter;
 	}
 }

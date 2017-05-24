@@ -18,9 +18,7 @@
 
 package eus.ixa.ixa.pipe.ml.polarity;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
+
 
 public interface DocumentClassification {
 
@@ -29,17 +27,17 @@ public interface DocumentClassification {
 	   * the provided extra information
 	   *
 	   * @param text the tokens of text to categorize
-	   * @param extraInformation extra information
+	   * @param additionalContext additional Context
 	   * @return per category probabilities
 	   */
-	  double[] categorize(String[] text, Map<String, Object> extraInformation);
+	String categorize(String[] text, final String[][] additionalContext);
 
 	  /**
 	   * Categorizes the given text, provided in separate tokens.
 	   * @param text the tokens of text to categorize
 	   * @return per category probabilities
 	   */
-	  double[] categorize(String[] text);
+	String categorize(String[] text);
 
 	  /**
 	   * get the best category from previously generated outcome probabilities
@@ -47,7 +45,7 @@ public interface DocumentClassification {
 	   * @param outcome a vector of outcome probabilities
 	   * @return the best category String
 	   */
-	  String getBestCategory(double[] outcome);
+	  //String getBestCategory(double[] outcome);
 
 	  /**
 	   * get the index of a certain category
@@ -55,7 +53,7 @@ public interface DocumentClassification {
 	   * @param category the category
 	   * @return an index
 	   */
-	  int getIndex(String category);
+	  //int getIndex(String category);
 
 	  /**
 	   * get the category at a given index
@@ -63,14 +61,14 @@ public interface DocumentClassification {
 	   * @param index the index
 	   * @return a category
 	   */
-	  String getCategory(int index);
+	  //String getCategory(int index);
 
 	  /**
 	   * get the number of categories
 	   *
 	   * @return the no. of categories
 	   */
-	  int getNumberOfCategories();
+	  //int getNumberOfCategories();
 
 	  /**
 	   * get the name of the category associated with the given probabilties
@@ -78,7 +76,7 @@ public interface DocumentClassification {
 	   * @param results the probabilities of each category
 	   * @return the name of the outcome
 	   */
-	  String getAllResults(double[] results);
+	  //String getAllResults(double[] results);
 
 	  /**
 	   * Returns a map in which the key is the category name and the value is the score
@@ -86,7 +84,7 @@ public interface DocumentClassification {
 	   * @param text the input text to classify
 	   * @return a map with the score as a key. The value is a Set of categories with the score.
 	   */
-	  Map<String, Double> scoreMap(String[] text);
+	  //Map<String, Double> scoreMap(String[] text);
 
 	  /**
 	   * Get a map of the scores sorted in ascending aorder together with their associated categories.
@@ -95,7 +93,7 @@ public interface DocumentClassification {
 	   * @param text the input text to classify
 	   * @return a map with the score as a key. The value is a Set of categories with the score.
 	   */
-	  SortedMap<Double, Set<String>> sortedScoreMap(String[] text);
+	  //SortedMap<Double, Set<String>> sortedScoreMap(String[] text);
 	  
 	  /**
 	   * Forgets all adaptive data which was collected during previous calls to one

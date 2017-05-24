@@ -28,6 +28,7 @@ import java.util.Properties;
 import opennlp.tools.ml.BeamSearch;
 import opennlp.tools.ml.model.AbstractModel;
 import opennlp.tools.ml.model.MaxentModel;
+import opennlp.tools.ml.model.SequenceClassificationModel;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.model.ArtifactSerializer;
 import opennlp.tools.util.model.BaseModel;
@@ -126,8 +127,9 @@ public class DocumentClassificationModel extends BaseModel {
 		    }
 		    checkArtifactMap();
 		  }
-	/*@SuppressWarnings({ "unchecked" })
-	public DocumentClassificationModel getDocumentClassificationModel() {
+	  
+	@SuppressWarnings({ "unchecked" })
+	public SequenceClassificationModel<String> getDocumentClassificationModel() {
 
 	    final Properties manifest = (Properties) this.artifactMap
 	        .get(MANIFEST_ENTRY);
@@ -145,12 +147,12 @@ public class DocumentClassificationModel extends BaseModel {
 	          (MaxentModel) this.artifactMap.get(MAXENT_MODEL_ENTRY_NAME));
 	    } else if (this.artifactMap
 	        .get(MAXENT_MODEL_ENTRY_NAME) instanceof DocumentClassificationModel) {
-	      return (DocumentClassificationModel) this.artifactMap
+	      return (SequenceClassificationModel<String>) this.artifactMap
 	          .get(MAXENT_MODEL_ENTRY_NAME);
 	    } else {
 	      return null;
 	    }
-	}*/
+	}
 	
 	public DocumentClassificationModel(InputStream in) throws IOException {
 		super(COMPONENT_NAME, in);
