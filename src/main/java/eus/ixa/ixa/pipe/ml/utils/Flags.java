@@ -255,17 +255,6 @@ public class Flags {
     return tokenClassFlag;
   }
   
-  public static String getBagOfWordsFeatures(
-	      final TrainingParameters params) {
-	    String BagOfWordsFlag = null;
-	    if (params.getSettings().get("BagOfWordsFeatures") != null) {
-	    	BagOfWordsFlag = params.getSettings().get("BagOfWordsFeatures");
-	    } else {
-	    	BagOfWordsFlag = Flags.DEFAULT_FEATURE_FLAG;
-	    }
-	    return BagOfWordsFlag;
-	  }
-  
   public static String getBagOfWordsFeaturesUseOnlyAllLetterTokens(
 	      final TrainingParameters params) {
 	    String UseOnlyAllLetterTokensFlag = null;
@@ -989,10 +978,6 @@ public class Flags {
     return !previousMapParam.equalsIgnoreCase(Flags.DEFAULT_FEATURE_FLAG);
   }
   
-  public static boolean isBagOfWordsFeature(final TrainingParameters params) {
-	    final String BagOfWordsParam = getBagOfWordsFeatures(params);
-	    return !BagOfWordsParam.equalsIgnoreCase(Flags.DEFAULT_FEATURE_FLAG);
-	  }
 
   public static boolean isOutcomePriorFeature(final TrainingParameters params) {
     final String outcomePriorParam = getOutcomePriorFeatures(params);

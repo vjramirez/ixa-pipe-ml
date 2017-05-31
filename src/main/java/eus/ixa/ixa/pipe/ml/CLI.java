@@ -135,9 +135,6 @@ public class CLI {
     this.parsevalParser = this.subParsers.addParser(PARSEVAL_PARSER_NAME)
         .help("Parseval CLI");
     loadParsevalParameters();
-    this.docTrainerParser = this.subParsers.addParser(DOC_TRAINER_NAME)
-        .help("Document Classification training CLI");
-    loadDocTrainingParameters();
     this.docevalParser = this.subParsers.addParser(DOCEVAL_PARSER_NAME)
         .help("Document Classification Evaluation CLI");
     loadDocevalParameters();
