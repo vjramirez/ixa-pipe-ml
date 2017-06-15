@@ -40,6 +40,10 @@ public class StatisticalDocumentClassifier {
         return category;
     }
     
+    public DocumentClassifierME getClassifierME() {
+    	return docClassifier;
+    }
+    
     /**
      * Classifies the given text, provided in separate tokens.
      * @param document the tokens of text to classify
@@ -79,6 +83,9 @@ public class StatisticalDocumentClassifier {
             if (!docClassifierModels.containsKey(lang + modelName)) {
               model = new DocumentClassifierModel(new FileInputStream(modelName));
               docClassifierModels.put(lang + modelName, model);
+            }
+            else {
+            	model = docClassifierModels.get(lang + modelName);
             }
           }
         } else {
