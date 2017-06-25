@@ -74,7 +74,7 @@ public class StatisticalDocumentClassifier {
     }
 
     private DocumentClassifierModel loadModel(final String lang,
-        final String modelName, final Boolean useModelCache) {
+      final String modelName, final Boolean useModelCache) {
       final long lStartTime = new Date().getTime();
       try {
         if (useModelCache) {
@@ -82,9 +82,6 @@ public class StatisticalDocumentClassifier {
             if (!docClassifierModels.containsKey(lang + modelName)) {
               DocumentClassifierModel model = new DocumentClassifierModel(new FileInputStream(modelName));
               docClassifierModels.put(lang + modelName, model);
-            }
-            else {
-            	model = docClassifierModels.get(lang + modelName);
             }
           }
         } else {
